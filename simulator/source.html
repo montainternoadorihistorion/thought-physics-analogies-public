@@ -1,0 +1,725 @@
+<div id="thought-physics-preview" data-start-scene="overview">
+  <style>
+    #thought-physics-preview .thought-header { padding-right: 96px; margin-bottom: 12px; word-break: keep-all; }
+    #thought-physics-preview h3 { margin: 0 0 4px; }
+    #thought-physics-preview .thought-field { margin: 12px 0 8px; }
+    #thought-physics-preview .thought-svg { display: block; width: 100%; color: var(--foreground); overflow: hidden; }
+    #thought-physics-preview .thought-svg text { fill: var(--foreground); font-size: var(--font-size-base); font-weight: 400; }
+    #thought-physics-preview .thought-worlds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    #thought-physics-preview .thought-world { min-width: 0; }
+    #thought-physics-preview .thought-world-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; }
+    #thought-physics-preview .thought-counts { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+    #thought-physics-preview .thought-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 8px; }
+    #thought-physics-preview .thought-swatch { display: inline-block; width: 8px; height: 8px; margin-right: 5px; background: var(--viz-series-1); border-radius: 50%; }
+    #thought-physics-preview .thought-swatch-copy { background: var(--viz-series-2); border-radius: 0; transform: rotate(45deg); }
+    #thought-physics-preview .thought-checks { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; }
+    #thought-physics-preview .thought-result { min-height: 1.5em; margin: 8px 0; }
+    #thought-physics-preview .thought-rule { margin-top: 6px; }
+    #thought-physics-preview .thought-story-flow { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 4px; }
+    #thought-physics-preview .thought-story-phase { color: var(--muted-foreground); }
+    #thought-physics-preview .thought-story-phase[data-active="true"] { color: var(--foreground); font-weight: 500; }
+    #thought-physics-preview [hidden] { display: none; }
+    @media (max-width: 600px) {
+      #thought-physics-preview .thought-worlds { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+    }
+  </style>
+  <div class="thought-header">
+    <h3>思考と重力の比喩</h3>
+    <span class="text-small text-muted" id="thought-header-subtitle">集める → 分ける → 育つ</span>
+  </div>
+  <div class="viz-controls">
+    <label class="form-label" for="thought-scene">場面
+      <select class="form-select" id="thought-scene">
+        <option value="overview">ひと続きで見る</option>
+        <option value="gravity">情報が集まり、集める力も育つ</option>
+        <option value="relativity">重力と時間の尺度</option>
+        <option value="reaction">作用反作用</option>
+      </select>
+    </label>
+    <label class="form-label" id="thought-gravity-controls" for="thought-strength">学ぶ人の初期引力 <span id="thought-strength-value" class="tabular-nums">1.0×</span>
+      <input class="form-range" id="thought-strength" type="range" min="0.5" max="3" step="0.5" value="1">
+    </label>
+    <label class="form-label" id="thought-relativity-controls" for="thought-compactness" hidden>重力源の質量（距離一定） <span id="thought-compactness-value" class="tabular-nums">相対量 0.60</span>
+      <input class="form-range" id="thought-compactness" type="range" min="0" max="0.8" step="0.05" value="0.6">
+    </label>
+    <label class="form-label" id="thought-reaction-controls" for="thought-mass" hidden>右の物体の質量
+      <select class="form-select" id="thought-mass">
+        <option value="1">左と同じ</option>
+        <option value="2" selected>左の2倍</option>
+      </select>
+    </label>
+  </div>
+  <div class="thought-checks" id="thought-information-controls">
+    <label class="form-check"><input class="form-check-input" id="thought-nearby" type="checkbox" checked><span class="form-check-label">隣に強い収集者</span></label>
+    <label class="form-check"><input class="form-check-input" id="thought-sharing" type="checkbox" checked><span class="form-check-label">集めた情報を共有</span></label>
+    <label class="form-check"><input class="form-check-input" id="thought-growth" type="checkbox" checked><span class="form-check-label">蓄積で引力が育つ</span></label>
+  </div>
+  <div class="viz-row">
+    <button class="btn btn-primary" id="thought-run" type="button">動きを見る</button>
+    <span class="text-small text-muted" id="thought-status" role="status" aria-live="polite">開始前</span>
+  </div>
+  <figure class="thought-field" id="thought-overview-field" hidden>
+    <div class="thought-story-flow text-small" aria-label="物語の流れ">
+      <span class="thought-story-phase" data-story-phase-label="collect">集める</span><span aria-hidden="true">→</span>
+      <span class="thought-story-phase" data-story-phase-label="share">分ける</span><span aria-hidden="true">→</span>
+      <span class="thought-story-phase" data-story-phase-label="grow">育つ</span>
+    </div>
+    <svg class="thought-svg" id="thought-overview-stage" role="img" aria-labelledby="thought-overview-title thought-overview-desc">
+      <title id="thought-overview-title">思考を重力に見立てた情報収集と、同じ受信区間を測る二つの時計</title>
+      <desc id="thought-overview-desc">丸い情報粒子が思考の中心に引き寄せられ、隣の強い思考から菱形のコピーが共有されます。異なる情報の蓄積に応じて引力が上限まで増します。二つの時計は、同じ情報を受け取る同じ区間を測ります。この例では外の時計で10秒、手元の時計で約6.32秒です。短いのは手元の経過時間で、外から見た情報収集の完了が時計の遅れによって早まる計算ではありません。手元でも自分の時計は通常どおり進みます。時計は球対称・非回転・無電荷の重力源の外側に静止させた時計と、無限遠の基準時計の独立した比較です。静的な質量条件uは0.6で固定し、時計の進みの比率は1からuを引いた値の平方根です。情報粒子の経路とコピーは従来の比喩モデルのままで、相対論の粒子や光の軌道を計算していません。比喩モデルの受信区間を外の時計の10秒へ例示的に換算しています。共有と蓄積による成長は追加の仮定です。針は一周10秒です。</desc>
+      <g id="thought-overview-drawing"></g>
+    </svg>
+    <figcaption class="thought-rule text-small text-muted">短いのは手元の経過時間</figcaption>
+  </figure>
+  <figure class="thought-field" id="thought-gravity-field">
+    <div class="thought-legend text-small">
+      <span><span class="thought-swatch" aria-hidden="true"></span>丸い点：情報粒子</span>
+      <span><span class="thought-swatch thought-swatch-copy" aria-hidden="true"></span>菱形：共有されたコピー</span>
+    </div>
+    <div class="thought-worlds">
+      <section class="thought-world" aria-labelledby="thought-alone-heading">
+        <div class="thought-world-heading"><span id="thought-alone-heading">学ぶ人が単独で集める</span><span class="tabular-nums" id="thought-alone-total">情報 0点</span></div>
+        <svg class="thought-svg" id="thought-alone-stage" role="img" aria-labelledby="thought-alone-title thought-alone-desc">
+          <title id="thought-alone-title">単独で情報を集める比喩モデル</title>
+          <desc id="thought-alone-desc">固定された中心に情報粒子が引き寄せられます。蓄積による成長を有効にすると、得た情報に応じて引力が上限まで増します。</desc>
+          <g id="thought-alone-drawing"></g>
+        </svg>
+        <div class="thought-counts text-small tabular-nums"><span id="thought-alone-own">自分で 0</span><span id="thought-alone-growth">引力 1.0×</span></div>
+      </section>
+      <section class="thought-world" aria-labelledby="thought-near-heading">
+        <div class="thought-world-heading"><span id="thought-near-heading">強い収集者のそばで集める</span><span class="tabular-nums" id="thought-near-total">情報 0点</span></div>
+        <svg class="thought-svg" id="thought-near-stage" role="img" aria-labelledby="thought-near-title thought-near-desc">
+          <title id="thought-near-title">隣の収集者と情報共有を比較する比喩モデル</title>
+          <desc id="thought-near-desc">左と同じ初期粒子です。隣の強い中心も粒子を集めます。共有を有効にすると、その情報のコピーが点線を通って学ぶ人に届きます。共有は引力とは別の追加ルールです。</desc>
+          <g id="thought-near-drawing"></g>
+        </svg>
+        <div class="thought-counts text-small tabular-nums"><span id="thought-near-own">自分で 0</span><span id="thought-near-received">共有 0</span><span id="thought-near-growth">引力 1.0×</span></div>
+      </section>
+    </div>
+    <figcaption class="thought-rule text-small text-muted" id="thought-information-rule">同じ初期粒子で比較・共有と蓄積による成長は追加ルール</figcaption>
+  </figure>
+  <figure class="thought-field" id="thought-relativity-field" hidden>
+    <div class="thought-world-heading"><span id="thought-relativity-heading">物理の時計</span><span class="tabular-nums" id="thought-relativity-rate">近く 63.2%</span></div>
+    <div class="text-small text-muted">同じ外部時間を比較</div>
+    <svg class="thought-svg" id="thought-relativity-stage" role="img" aria-labelledby="thought-relativity-title thought-relativity-desc">
+      <title id="thought-relativity-title">重力による時計の進み方の違い</title>
+      <desc id="thought-relativity-desc">球対称・非回転・無電荷の重力源の外側で、一定の半径に静止させた時計を、無限遠の基準時計と比べます。近くの時計の経過時間は、基準の経過時間に1から質量の相対量uを引いた平方根を掛けた値です。近くでも自分の時計は通常どおりに進みます。質量の操作は別の静的な条件で比較をやり直します。時計の針は一周10秒の目盛です。</desc>
+      <g id="thought-relativity-drawing"></g>
+    </svg>
+    <figcaption class="thought-rule text-small text-muted">近くでも、自分の時計は通常どおり</figcaption>
+  </figure>
+  <figure class="thought-field" id="thought-reaction-field" hidden>
+    <div class="text-small">矢印：同じ大きさ・逆向きの力</div>
+    <svg class="thought-svg" id="thought-stage" role="img" aria-labelledby="thought-svg-title thought-svg-desc">
+      <title id="thought-svg-title">作用と反作用で動く二つの物体</title>
+      <desc id="thought-svg-desc">左向きと右向きに、等しい大きさの力が短く働きます。質量が大きい物体の加速度は小さくなります。</desc>
+      <defs><marker id="thought-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="var(--viz-series-1)"></path></marker></defs>
+      <g id="thought-drawing"></g>
+    </svg>
+  </figure>
+  <p class="thought-result tabular-nums" id="thought-result">同じ情報粒子から、単独と隣に収集者がいる場合を比べる</p>
+  <script>
+    (() => {
+      const root = document.getElementById('thought-physics-preview');
+      if (!root) return;
+      const find = id => root.querySelector('#thought-' + id);
+      const controls = {
+        scene: find('scene'), strength: find('strength'), rightMass: find('mass'),
+        nearby: find('nearby'), sharing: find('sharing'), growth: find('growth'), compactness: find('compactness')
+      };
+      const result = find('result');
+      const status = find('status');
+      const runButton = find('run');
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const svgNS = 'http://www.w3.org/2000/svg';
+      const fixedStep = 1 / 120;
+      const particleCount = 72;
+      const worldWidth = 400;
+      const worldHeight = 240;
+      const learnerCenter = { x: 145, y: 135, base: 1 };
+      const collectorCenter = { x: 300, y: 100, base: 3.8 };
+      const captureRadius = 15;
+      const softening = 20;
+      const gravityConstant = 110000;
+      const sharingDelay = 0.48;
+      const collectionDuration = 6;
+      const growthLimit = 2.8;
+      const growthInformationScale = 48;
+      const referenceInterval = 10;
+      const overviewPreset = Object.freeze({ strength: 1, nearby: true, sharing: true, growth: true, compactness: 0.6 });
+      const validScenes = ['overview', 'gravity', 'relativity', 'reaction'];
+      const initialScene = normalizeScene(root.dataset.startScene) || 'gravity';
+      let choices = { scene: initialScene, strength: 1, rightMass: 2, nearby: true, sharing: true, growth: true, compactness: 0.6 };
+      let worlds = [];
+      let reactionNodes = null;
+      let relativityNodes = null;
+      let overviewNodes = null;
+      let elapsed = 0;
+      let running = false;
+      let phase = 'ready';
+      let animation = 0;
+      let lastFrame = 0;
+      let pendingStep = 0;
+      let measuredWidth = 0;
+      const dimensions = { alone: 320, near: 320, reaction: 640, relativity: 640, overview: 640 };
+
+      function make(parent, name, attrs = {}) {
+        const node = document.createElementNS(svgNS, name);
+        Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, String(value)));
+        parent.appendChild(node);
+        return node;
+      }
+      function text(parent, value, x, y, anchor = 'middle') {
+        const node = make(parent, 'text', { x, y, 'text-anchor': anchor });
+        node.textContent = value;
+        return node;
+      }
+      function stateKey() { return JSON.stringify(choices); }
+      function normalizeScene(value) {
+        if (value === 'time') return 'overview';
+        return validScenes.includes(value) ? value : null;
+      }
+      function informationSettings() { return choices.scene === 'overview' ? overviewPreset : choices; }
+      function duration() { return choices.scene === 'overview' || choices.scene === 'gravity' ? collectionDuration + 0.5 : choices.scene === 'relativity' ? 6 : 3; }
+      function persist() {
+        if (typeof window.openai?.setWidgetState !== 'function') return;
+        const names = { overview: '思考と重力・情報収集と二つの時計', gravity: '情報収集・共有・蓄積', relativity: '重力と時間の尺度', reaction: '作用反作用' };
+        const active = choices.scene === 'overview' ? overviewPreset : choices;
+        // Inline and exported hosts may return void or a Promise respectively.
+        Promise.resolve(window.openai.setWidgetState({
+          modelContent: { scene: names[choices.scene], attractionMultiplier: active.strength, nearbyCollector: active.nearby, sharingCopies: active.sharing, accumulationGrowth: active.growth, gravitationalCompactness: active.compactness, ...(choices.scene === 'overview' ? {} : { rightToLeftMassRatio: choices.rightMass }) },
+          privateContent: { ...choices }
+        })).catch(() => {});
+      }
+      function stop() {
+        running = false;
+        cancelAnimationFrame(animation);
+        animation = 0;
+      }
+      function configure() {
+        Object.entries(controls).forEach(([key, control]) => {
+          if (control.type === 'checkbox') control.checked = choices[key];
+          else control.value = String(choices[key]);
+        });
+        find('strength-value').textContent = choices.strength.toFixed(1) + '×';
+        find('header-subtitle').hidden = choices.scene === 'overview';
+        find('compactness-value').textContent = '相対量 ' + choices.compactness.toFixed(2);
+        controls.compactness.setAttribute('aria-valuetext', '質量の相対量 ' + choices.compactness.toFixed(2) + '、近くの時計の進み ' + (Math.sqrt(1 - choices.compactness) * 100).toFixed(1) + 'パーセント');
+        find('gravity-controls').hidden = choices.scene !== 'gravity';
+        find('information-controls').hidden = choices.scene !== 'gravity';
+        find('relativity-controls').hidden = choices.scene !== 'relativity';
+        find('reaction-controls').hidden = choices.scene !== 'reaction';
+        validScenes.forEach(name => { find(name + '-field').hidden = choices.scene !== name; });
+        controls.sharing.disabled = !choices.nearby;
+        find('near-heading').textContent = choices.nearby ? '強い収集者のそばで集める' : '隣の収集者なし';
+        find('information-rule').textContent = choices.nearby && !choices.sharing
+          ? '共有なし：隣の引力は、同じ粒子を奪い合う場合もある'
+          : '同じ初期粒子で比較・共有と蓄積による成長は追加ルール';
+      }
+      function growthMultiplier(known) {
+        return informationSettings().growth ? 1 + (growthLimit - 1) * Math.min(known.size / growthInformationScale, 1) : 1;
+      }
+      function effectiveMass(world, owner) {
+        return owner === 'learner'
+          ? learnerCenter.base * informationSettings().strength * growthMultiplier(world.known)
+          : collectorCenter.base * growthMultiplier(world.collector);
+      }
+      function createWorld(neighbor) {
+        let seed = 38123;
+        const random = () => {
+          seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+          return seed / 4294967296;
+        };
+        const particles = Array.from({ length: particleCount }, (_, id) => {
+          let x = 18 + random() * (worldWidth - 36);
+          let y = 16 + random() * (worldHeight - 32);
+          // Both comparison worlds use the same exclusion zones and seed.
+          for (const center of [learnerCenter, collectorCenter]) {
+            if (Math.hypot(x - center.x, y - center.y) < 36) {
+              const angle = random() * Math.PI * 2;
+              x = center.x + Math.cos(angle) * 38;
+              y = center.y + Math.sin(angle) * 38;
+            }
+          }
+          return { id, x, y, vx: 0, vy: 0, owner: null, trail: [[x, y]] };
+        });
+        return { neighbor, particles, own: new Set(), received: new Set(), known: new Set(), collector: new Set(), copies: [], nodes: null };
+      }
+      function fieldNodes(parent, owner) {
+        const group = make(parent, 'g', { 'data-center': owner });
+        const rings = [1, 1.5, 2].map((scale, index) => make(group, 'ellipse', { fill: index === 0 ? 'var(--viz-series-1)' : 'none', 'fill-opacity': 0.07, stroke: 'var(--viz-series-1)', 'stroke-opacity': 0.12, 'stroke-width': 1, 'data-ring': scale }));
+        const center = make(group, 'circle', { r: 11, fill: 'var(--viz-series-1)', 'fill-opacity': owner === 'learner' ? 0.65 : 0.3 });
+        return { group, rings, center };
+      }
+      function buildGravity() {
+        find('alone-drawing').replaceChildren();
+        find('near-drawing').replaceChildren();
+        worlds.forEach((world, index) => {
+          const name = index === 0 ? 'alone' : 'near';
+          const drawing = choices.scene === 'overview' && index === 1 ? overviewNodes.information : find(name + '-drawing');
+          drawing.replaceChildren();
+          const connector = make(drawing, 'line', { stroke: 'var(--viz-series-2)', 'stroke-opacity': 0.6, 'stroke-width': 1.5, 'stroke-dasharray': '4 5', 'data-sharing-path': name });
+          const trails = world.particles.map(p => make(drawing, 'polyline', { fill: 'none', stroke: 'var(--foreground)', 'stroke-opacity': 0.16, 'stroke-width': 1, 'data-trail': p.id }));
+          const learner = fieldNodes(drawing, 'learner');
+          const collector = world.neighbor ? fieldNodes(drawing, 'collector') : null;
+          const particles = world.particles.map(p => make(drawing, 'circle', { r: 2.5, fill: 'var(--foreground)', 'fill-opacity': 0.55, 'data-particle': p.id }));
+          const copies = make(drawing, 'g', { fill: 'var(--viz-series-2)', 'data-copy-layer': name });
+          const learnerLabel = text(drawing, '学ぶ人', 0, 0);
+          const collectorLabel = world.neighbor ? text(drawing, '収集者', 0, 0) : null;
+          world.nodes = { drawing, connector, learner, collector, trails, particles, copies, learnerLabel, collectorLabel };
+        });
+      }
+      function setView(name, svg, height) {
+        const width = Math.max(120, Math.round(svg.getBoundingClientRect().width) || dimensions[name]);
+        dimensions[name] = width;
+        svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+        svg.setAttribute('height', height);
+      }
+      function buildReaction() {
+        const drawing = find('drawing');
+        drawing.replaceChildren();
+        const width = dimensions.reaction;
+        const height = width < 420 ? 250 : 272;
+        make(drawing, 'line', { x1: 22, x2: width - 22, y1: height / 2, y2: height / 2, stroke: 'var(--border)', 'stroke-width': 1 });
+        const left = make(drawing, 'circle', { r: 14, cy: height / 2, fill: 'var(--viz-series-1)', 'fill-opacity': 0.35, 'data-body': 'left' });
+        const right = make(drawing, 'circle', { r: choices.rightMass === 1 ? 14 : 20, cy: height / 2, fill: 'var(--viz-series-1)', 'fill-opacity': 0.35, 'data-body': 'right' });
+        const arrow = side => make(drawing, 'line', { y1: height / 2, y2: height / 2, stroke: 'var(--viz-series-1)', 'stroke-width': 2, 'marker-end': 'url(#thought-arrow)', 'data-force': side });
+        reactionNodes = { left, right, leftArrow: arrow('left'), rightArrow: arrow('right'), leftLabel: text(drawing, '左：質量 1', 0, height / 2 + 52), rightLabel: text(drawing, '右：質量 ' + choices.rightMass, 0, height / 2 + 52) };
+        text(drawing, '力を短く加える', width / 2, 42);
+      }
+      function buildRelativity() {
+        const drawing = find('relativity-drawing');
+        drawing.replaceChildren();
+        const width = dimensions.relativity;
+        const left = 16;
+        const right = width - 16;
+        const span = right - left;
+        const rate = Math.sqrt(1 - choices.compactness);
+        const clocks = {};
+        for (const [name, cx, caption] of [['reference', width * 0.25, '無限遠の基準時計'], ['local', width * 0.75, '近くで静止']]) {
+          text(drawing, caption, cx, 18);
+          make(drawing, 'circle', { cx, cy: 67, r: 31, fill: 'none', stroke: 'var(--border)', 'stroke-width': 1 });
+          for (let tick = 0; tick < 10; tick++) {
+            const angle = tick * Math.PI / 5 - Math.PI / 2;
+            make(drawing, 'line', { x1: cx + Math.cos(angle) * 27, y1: 67 + Math.sin(angle) * 27, x2: cx + Math.cos(angle) * 31, y2: 67 + Math.sin(angle) * 31, stroke: 'var(--muted-foreground)', 'stroke-width': 1 });
+          }
+          const hand = make(drawing, 'line', { x1: cx, y1: 67, x2: cx, y2: 43, stroke: name === 'reference' ? 'var(--foreground)' : 'var(--viz-series-1)', 'stroke-width': 2, 'data-relativity-hand': name });
+          make(drawing, 'circle', { cx, cy: 67, r: 3, fill: name === 'reference' ? 'var(--foreground)' : 'var(--viz-series-1)' });
+          const reading = text(drawing, '0.00秒', cx, 120);
+          reading.setAttribute('id', 'thought-relativity-' + name + '-reading');
+          clocks[name] = { hand, reading, cx };
+        }
+        text(drawing, '針の目盛：1周10秒', width / 2, 143);
+        const elapsedBars = {};
+        for (const [name, y, interval, caption] of [['reference', 184, referenceInterval, '基準'], ['local', 254, referenceInterval * rate, '近く']]) {
+          text(drawing, caption + '：' + interval.toFixed(2) + '秒', left, y - 12, 'start');
+          make(drawing, 'rect', { x: left, y, width: span, height: 12, rx: 3, fill: 'var(--muted)' });
+          make(drawing, 'rect', { x: left, y, width: span * interval / referenceInterval, height: 12, rx: 3, fill: name === 'reference' ? 'var(--foreground)' : 'var(--viz-series-1)', 'fill-opacity': 0.2, 'data-relativity-ruler': name });
+          elapsedBars[name] = make(drawing, 'rect', { x: left, y, width: 0, height: 12, rx: 3, fill: name === 'reference' ? 'var(--foreground)' : 'var(--viz-series-1)', 'fill-opacity': 0.65, 'data-relativity-elapsed': name });
+          text(drawing, '0秒', left, y + 32, 'start');
+          text(drawing, '10秒の尺度', right, y + 32, 'end');
+        }
+        relativityNodes = { clocks, elapsedBars, span, rate };
+
+      }
+      function buildOverview() {
+        const drawing = find('overview-drawing');
+        drawing.replaceChildren();
+        const width = dimensions.overview;
+        const information = make(drawing, 'g', { 'data-story-information': 'true' });
+        const informationLabel = text(drawing, '自分で0 ＋ 共有0', 16, 50, 'start');
+        text(drawing, '共有', (learnerCenter.x + collectorCenter.x) / (2 * worldWidth) * width, 103);
+        const clocks = {};
+        const clockY = 332;
+        const clockLeft = width < 500 ? width * 0.28 : 62;
+        const clockRight = width < 500 ? width * 0.72 : 174;
+        text(drawing, '同じ受信区間・1周10秒', 16, clockY - 54, 'start');
+        for (const [name, cx, caption] of [['reference', clockLeft, '外の時計'], ['local', clockRight, '手元の時計']]) {
+          text(drawing, caption, cx, clockY - 28);
+          make(drawing, 'circle', { cx, cy: clockY, r: 20, fill: 'none', stroke: 'var(--border)', 'stroke-width': 1 });
+          const hand = make(drawing, 'line', { x1: cx, y1: clockY, x2: cx, y2: clockY - 16, stroke: name === 'reference' ? 'var(--foreground)' : 'var(--viz-series-1)', 'stroke-width': 2, 'data-story-clock': name });
+          const reading = text(drawing, '0.00秒', cx, clockY + 42);
+          const ruler = make(drawing, 'rect', { x: cx - 38, y: clockY + 52, width: 0, height: 5, rx: 2, fill: name === 'reference' ? 'var(--foreground)' : 'var(--viz-series-1)', 'data-story-clock-ruler': name });
+          clocks[name] = { cx, hand, reading, ruler };
+        }
+        overviewNodes = { information, informationLabel, clocks, clockY };
+      }
+      function reset() {
+        stop();
+        elapsed = 0;
+        pendingStep = 0;
+        phase = 'ready';
+        configure();
+        worlds = [createWorld(false), createWorld(informationSettings().nearby)];
+        measure();
+        buildOverview();
+        buildGravity();
+        buildReaction();
+        buildRelativity();
+        draw();
+        runButton.textContent = '動きを見る';
+        status.textContent = '開始前';
+      }
+      function measure() {
+        setView('alone', find('alone-stage'), worldHeight);
+        setView('near', find('near-stage'), worldHeight);
+        setView('relativity', find('relativity-stage'), 302);
+        const fullWidth = Math.max(120, Math.round(root.getBoundingClientRect().width) || 640);
+        dimensions.overview = fullWidth;
+        find('overview-stage').setAttribute('viewBox', '0 0 ' + fullWidth + ' 400');
+        find('overview-stage').setAttribute('height', 400);
+        if (choices.scene === 'overview') dimensions.near = fullWidth;
+        dimensions.reaction = fullWidth;
+        find('stage').setAttribute('viewBox', '0 0 ' + fullWidth + ' ' + (fullWidth < 420 ? 250 : 272));
+        find('stage').setAttribute('height', fullWidth < 420 ? 250 : 272);
+      }
+      function acceleration(world, x, y) {
+        let ax = 0;
+        let ay = 0;
+        const centers = world.neighbor ? [['learner', learnerCenter], ['collector', collectorCenter]] : [['learner', learnerCenter]];
+        for (const [owner, center] of centers) {
+          const dx = center.x - x;
+          const dy = center.y - y;
+          const softenedSquare = dx * dx + dy * dy + softening * softening;
+          const factor = gravityConstant * effectiveMass(world, owner) / Math.pow(softenedSquare, 1.5);
+          ax += dx * factor;
+          ay += dy * factor;
+        }
+        return { x: ax, y: ay };
+      }
+      function crossingFraction(p, x, y, center) {
+        const dx = x - p.x;
+        const dy = y - p.y;
+        const ox = p.x - center.x;
+        const oy = p.y - center.y;
+        const a = dx * dx + dy * dy;
+        const c = ox * ox + oy * oy - captureRadius * captureRadius;
+        if (c <= 0) return 0;
+        if (a === 0) return Infinity;
+        const b = 2 * (ox * dx + oy * dy);
+        const discriminant = b * b - 4 * a * c;
+        if (discriminant < 0) return Infinity;
+        const first = (-b - Math.sqrt(discriminant)) / (2 * a);
+        return first >= 0 && first <= 1 ? first : Infinity;
+      }
+      function stepWorld(world, dt) {
+        // All particles in a step see the same mass snapshot; captures update it for the next step.
+        const captures = [];
+        for (const p of world.particles) {
+          if (p.owner || elapsed >= collectionDuration - 0.000001) continue;
+          const a = acceleration(world, p.x, p.y);
+          const x = p.x + p.vx * dt + a.x * dt * dt / 2;
+          const y = p.y + p.vy * dt + a.y * dt * dt / 2;
+          const next = acceleration(world, x, y);
+          const learnerHit = crossingFraction(p, x, y, learnerCenter);
+          const collectorHit = world.neighbor ? crossingFraction(p, x, y, collectorCenter) : Infinity;
+          if (learnerHit < Infinity || collectorHit < Infinity) {
+            p.owner = learnerHit <= collectorHit ? 'learner' : 'collector';
+            captures.push(p);
+          } else {
+            p.x = x;
+            p.y = y;
+            p.vx += (a.x + next.x) * dt / 2;
+            p.vy += (a.y + next.y) * dt / 2;
+            if (Math.floor((elapsed + dt) / 0.08) !== Math.floor(elapsed / 0.08)) {
+              p.trail.push([x, y]);
+              if (p.trail.length > 9) p.trail.shift();
+            }
+          }
+        }
+        for (const p of captures) {
+          if (p.owner === 'learner') {
+            world.own.add(p.id);
+            world.known.add(p.id);
+            world.received.delete(p.id);
+          } else {
+            world.collector.add(p.id);
+            if (informationSettings().sharing) world.copies.push({ id: p.id, start: elapsed, end: elapsed + sharingDelay, delivered: false });
+          }
+        }
+        for (const copy of world.copies) {
+          if (!copy.delivered && elapsed + dt >= copy.end) {
+            copy.delivered = true;
+            if (!world.known.has(copy.id)) {
+              world.received.add(copy.id);
+              world.known.add(copy.id);
+            }
+          }
+        }
+      }
+      function step(dt) {
+        if (choices.scene === 'gravity') worlds.forEach(world => stepWorld(world, dt));
+        else if (choices.scene === 'overview') stepWorld(worlds[1], dt);
+        elapsed += dt;
+      }
+      function packedPosition(index, count, center, radius) {
+        const angle = index * 2.399963229728653;
+        const r = radius * Math.sqrt((index + 0.5) / Math.max(count, 1));
+        return { x: center.x + Math.cos(angle) * r, y: center.y + Math.sin(angle) * r };
+      }
+      function drawGravity() {
+        worlds.forEach((world, index) => {
+          const name = index === 0 ? 'alone' : 'near';
+          const scaleX = dimensions[name] / worldWidth;
+          const nodes = world.nodes;
+          const learnerGrowth = growthMultiplier(world.known);
+          for (const [owner, center, fields] of [['learner', learnerCenter, nodes.learner], ['collector', collectorCenter, nodes.collector]]) {
+            if (!fields) continue;
+            const mass = effectiveMass(world, owner);
+            fields.group.setAttribute('data-field-multiplier', mass.toFixed(6));
+            const radius = 24 * Math.sqrt(mass);
+            fields.rings.forEach((ring, i) => {
+              ring.setAttribute('cx', center.x * scaleX);
+              ring.setAttribute('cy', center.y);
+              ring.setAttribute('rx', radius * (1 + i * 0.5) * scaleX);
+              ring.setAttribute('ry', radius * (1 + i * 0.5));
+            });
+            fields.center.setAttribute('cx', center.x * scaleX);
+            fields.center.setAttribute('cy', center.y);
+            fields.center.setAttribute('r', 9 + 3 * Math.sqrt(mass));
+          }
+          nodes.learnerLabel.setAttribute('x', learnerCenter.x * scaleX);
+          nodes.learnerLabel.setAttribute('y', 217);
+          if (nodes.collectorLabel) {
+            nodes.collectorLabel.setAttribute('x', collectorCenter.x * scaleX);
+            nodes.collectorLabel.setAttribute('y', 26);
+          }
+          let ownIndex = 0;
+          let collectorIndex = 0;
+          world.particles.forEach((p, i) => {
+            const node = nodes.particles[i];
+            const trail = nodes.trails[i];
+            trail.setAttribute('points', p.trail.map(point => (point[0] * scaleX) + ',' + point[1]).join(' '));
+            trail.setAttribute('visibility', p.owner ? 'hidden' : 'visible');
+            const center = p.owner === 'learner' ? learnerCenter : collectorCenter;
+            const pos = p.owner ? packedPosition(p.owner === 'learner' ? ownIndex++ : collectorIndex++, p.owner === 'learner' ? world.own.size : world.collector.size, center, 14 + 4 * Math.sqrt(p.owner === 'learner' ? learnerGrowth : growthMultiplier(world.collector))) : p;
+            node.setAttribute('cx', pos.x * scaleX);
+            node.setAttribute('cy', pos.y);
+            node.setAttribute('r', p.owner ? 2 : 2.5);
+            node.setAttribute('fill', p.owner ? 'var(--viz-series-1)' : 'var(--foreground)');
+            node.setAttribute('fill-opacity', p.owner ? 0.95 : 0.55);
+            node.setAttribute('data-owner', p.owner || 'free');
+          });
+          nodes.connector.setAttribute('x1', collectorCenter.x * scaleX);
+          nodes.connector.setAttribute('y1', collectorCenter.y);
+          nodes.connector.setAttribute('x2', learnerCenter.x * scaleX);
+          nodes.connector.setAttribute('y2', learnerCenter.y);
+          nodes.connector.setAttribute('visibility', world.neighbor && informationSettings().sharing ? 'visible' : 'hidden');
+          nodes.copies.replaceChildren();
+          let copyIndex = 0;
+          for (const id of world.received) {
+            const pos = packedPosition(copyIndex++, world.received.size, learnerCenter, 29 + 4 * Math.sqrt(learnerGrowth));
+            make(nodes.copies, 'rect', { x: -2, y: -2, width: 4, height: 4, transform: 'translate(' + (pos.x * scaleX) + ' ' + pos.y + ') rotate(45)', 'data-received-id': id });
+          }
+          for (const copy of world.copies) {
+            if (copy.delivered) continue;
+            const progress = Math.max(0, Math.min(1, (elapsed - copy.start) / sharingDelay));
+            const x = (collectorCenter.x + (learnerCenter.x - collectorCenter.x) * progress) * scaleX;
+            const y = collectorCenter.y + (learnerCenter.y - collectorCenter.y) * progress;
+            make(nodes.copies, 'rect', { x: -3, y: -3, width: 6, height: 6, transform: 'translate(' + x + ' ' + y + ') rotate(45)', 'data-copy-id': copy.id });
+          }
+          const stage = find(name + '-stage');
+          stage.setAttribute('data-own', world.own.size);
+          stage.setAttribute('data-received', world.received.size);
+          stage.setAttribute('data-known', world.known.size);
+          stage.setAttribute('data-collector', world.collector.size);
+          stage.setAttribute('data-growth', learnerGrowth.toFixed(6));
+          find(name + '-total').textContent = '情報 ' + world.known.size + '点';
+          find(name + '-own').textContent = '自分で ' + world.own.size;
+          if (index === 1) find('near-received').textContent = '共有 ' + world.received.size;
+          find(name + '-growth').textContent = '引力 ' + (informationSettings().strength * learnerGrowth).toFixed(1) + '×';
+        });
+        result.textContent = elapsed === 0 ? '同じ情報粒子から、単独と隣に収集者がいる場合を比べる' : '学ぶ人が持つ情報：単独 ' + worlds[0].known.size + '点 ／ 比較側 ' + worlds[1].known.size + '点';
+      }
+      function drawReaction() {
+        const width = dimensions.reaction;
+        const impulseDuration = 0.65;
+        const accelerationMagnitude = Math.min(18, width * 0.052);
+        const displacement = elapsed <= impulseDuration ? accelerationMagnitude * elapsed * elapsed / 2 : accelerationMagnitude * impulseDuration * (elapsed - impulseDuration / 2);
+        const leftX = width * 0.33 - displacement;
+        const rightX = width * 0.67 + displacement / choices.rightMass;
+        reactionNodes.left.setAttribute('cx', leftX);
+        reactionNodes.right.setAttribute('cx', rightX);
+        reactionNodes.left.setAttribute('data-displacement', displacement.toFixed(6));
+        reactionNodes.right.setAttribute('data-displacement', (displacement / choices.rightMass).toFixed(6));
+        reactionNodes.leftLabel.setAttribute('x', leftX);
+        reactionNodes.rightLabel.setAttribute('x', rightX);
+        const forceLength = Math.min(38, width * 0.12);
+        for (const [arrow, origin, direction] of [[reactionNodes.leftArrow, leftX, -1], [reactionNodes.rightArrow, rightX, 1]]) {
+          arrow.setAttribute('x1', origin + direction * 26);
+          arrow.setAttribute('x2', origin + direction * (26 + forceLength));
+          arrow.setAttribute('visibility', elapsed === 0 || elapsed <= impulseDuration ? 'visible' : 'hidden');
+        }
+        result.textContent = choices.rightMass === 1 ? '同じ質量 → 同じ大きさの動き' : '右の質量は2倍 → 動く距離は左の半分';
+      }
+      function drawRelativity() {
+        const n = relativityNodes;
+        const progress = Math.max(0, Math.min(1, elapsed / duration()));
+        const referenceElapsed = referenceInterval * progress;
+        const localElapsed = referenceElapsed * n.rate;
+        for (const [name, value] of [['reference', referenceElapsed], ['local', localElapsed]]) {
+          const clock = n.clocks[name];
+          const angle = value / referenceInterval * 2 * Math.PI - Math.PI / 2;
+          clock.hand.setAttribute('x2', clock.cx + Math.cos(angle) * 24);
+          clock.hand.setAttribute('y2', 67 + Math.sin(angle) * 24);
+          clock.hand.setAttribute('data-elapsed', value.toFixed(9));
+          clock.hand.setAttribute('data-angle', (value / referenceInterval * 360).toFixed(9));
+          clock.reading.textContent = value.toFixed(2) + '秒';
+          n.elapsedBars[name].setAttribute('width', n.span * value / referenceInterval);
+        }
+        find('relativity-rate').textContent = '近く ' + (n.rate * 100).toFixed(1) + '%';
+        const stage = find('relativity-stage');
+        stage.setAttribute('data-model', 'schwarzschild-static-exterior');
+        stage.setAttribute('data-compactness', choices.compactness.toFixed(2));
+        stage.setAttribute('data-rate', n.rate.toFixed(12));
+        stage.setAttribute('data-reference-interval', referenceInterval);
+        stage.setAttribute('data-local-interval', (referenceInterval * n.rate).toFixed(9));
+        stage.setAttribute('data-reference-elapsed', referenceElapsed.toFixed(9));
+        stage.setAttribute('data-local-elapsed', localElapsed.toFixed(9));
+        result.textContent = '無限遠で10秒の間、近くでは ' + (referenceInterval * n.rate).toFixed(2) + '秒';
+      }
+      function drawOverview() {
+        drawGravity();
+        const n = overviewNodes;
+        const world = worlds[1];
+        const storyPhase = elapsed < 1.5 ? 'collect' : elapsed < 3.5 ? 'share' : 'grow';
+        root.querySelectorAll('[data-story-phase-label]').forEach(node => {
+          const selected = node.getAttribute('data-story-phase-label') === storyPhase;
+          node.setAttribute('data-active', selected);
+          if (selected) node.setAttribute('aria-current', 'step');
+          else node.removeAttribute('aria-current');
+        });
+        const maximumCopyRadius = (29 + 4 * Math.sqrt(growthLimit)) * dimensions.overview / worldWidth;
+        world.nodes.learnerLabel.setAttribute('x', learnerCenter.x / worldWidth * dimensions.overview - maximumCopyRadius - 8);
+        world.nodes.learnerLabel.setAttribute('y', learnerCenter.y + 4);
+        world.nodes.learnerLabel.setAttribute('text-anchor', 'end');
+        world.nodes.learnerLabel.textContent = '思考';
+        world.nodes.collectorLabel.textContent = '隣の強い思考';
+        n.informationLabel.textContent = '自分で ' + world.own.size + ' ＋ 共有 ' + world.received.size + ' ＝ ' + world.known.size;
+        const rate = Math.sqrt(1 - overviewPreset.compactness);
+        const referenceElapsed = Math.min(1, elapsed / duration()) * referenceInterval;
+        const localElapsed = referenceElapsed * rate;
+        for (const [name, current] of [['reference', referenceElapsed], ['local', localElapsed]]) {
+          const clock = n.clocks[name];
+          const angle = current / referenceInterval * Math.PI * 2 - Math.PI / 2;
+          clock.hand.setAttribute('x2', clock.cx + Math.cos(angle) * 16);
+          clock.hand.setAttribute('y2', n.clockY + Math.sin(angle) * 16);
+          clock.hand.setAttribute('data-elapsed', current.toFixed(9));
+          clock.hand.setAttribute('data-angle', (current / referenceInterval * 360).toFixed(9));
+          clock.reading.textContent = current.toFixed(2) + '秒';
+          clock.ruler.setAttribute('width', 76 * current / referenceInterval);
+        }
+        const stage = find('overview-stage');
+        const metrics = {
+          'story-phase': storyPhase, own: world.own.size, received: world.received.size, known: world.known.size,
+          collector: world.collector.size, growth: growthMultiplier(world.known).toFixed(6),
+          'reference-elapsed': referenceElapsed.toFixed(9), 'local-elapsed': localElapsed.toFixed(9), rate: rate.toFixed(12),
+          'reference-interval': referenceInterval, 'local-interval': (referenceInterval * rate).toFixed(9),
+          'clock-model': 'static-schwarzschild-comparison', 'interval-model': 'illustrative-reception-rescaling', compactness: overviewPreset.compactness
+        };
+        Object.entries(metrics).forEach(([key, value]) => stage.setAttribute('data-' + key, value));
+        result.textContent = '同じ情報：外で10秒 ／ 手元で' + (referenceInterval * rate).toFixed(2) + '秒';
+      }
+      function draw() {
+        root.setAttribute('data-scene', choices.scene);
+        root.setAttribute('data-phase', phase);
+        root.setAttribute('data-elapsed', elapsed.toFixed(6));
+        if (choices.scene === 'overview') drawOverview();
+        else if (choices.scene === 'gravity') drawGravity();
+        else if (choices.scene === 'relativity') drawRelativity();
+        else drawReaction();
+      }
+      function finish() {
+        stop();
+        phase = 'complete';
+        draw();
+        runButton.textContent = 'もう一度見る';
+        status.textContent = '終了';
+        persist();
+      }
+      function tick(now) {
+        if (!running) return;
+        pendingStep += Math.min(0.1, (now - lastFrame) / 1000);
+        lastFrame = now;
+        while (pendingStep >= fixedStep && elapsed < duration()) {
+          step(Math.min(fixedStep, duration() - elapsed));
+          pendingStep -= fixedStep;
+        }
+        draw();
+        if (elapsed >= duration() - 0.000001) finish();
+        else animation = requestAnimationFrame(tick);
+      }
+      runButton.addEventListener('click', () => {
+        if (running) {
+          stop();
+          phase = 'paused';
+          draw();
+          runButton.textContent = '続きを見る';
+          status.textContent = '一時停止';
+          return;
+        }
+        if (phase === 'complete') reset();
+        if (reducedMotion.matches) {
+          while (elapsed < duration() - 0.000001) step(Math.min(fixedStep, duration() - elapsed));
+          finish();
+          return;
+        }
+        running = true;
+        phase = 'running';
+        runButton.textContent = '一時停止';
+        status.textContent = '動作中';
+        lastFrame = performance.now();
+        animation = requestAnimationFrame(tick);
+      });
+      Object.entries(controls).forEach(([key, control]) => {
+        const change = () => {
+          choices[key] = control.type === 'checkbox' ? control.checked : key === 'scene' ? control.value : Number(control.value);
+          reset();
+        };
+        if (control.type === 'range') {
+          control.addEventListener('input', change);
+          control.addEventListener('change', persist);
+        } else control.addEventListener('change', () => { change(); persist(); });
+      });
+      function restore(saved) {
+        const state = saved?.privateContent || saved;
+        if (!state || typeof state !== 'object' || Array.isArray(state)) return;
+        const restoredScene = normalizeScene(state.scene);
+        if (restoredScene) choices.scene = restoredScene;
+        if (Number.isFinite(state.strength) && state.strength >= 0.5 && state.strength <= 3 && Number.isInteger(state.strength * 2)) choices.strength = state.strength;
+        if (state.rightMass === 1 || state.rightMass === 2) choices.rightMass = state.rightMass;
+        for (const key of ['nearby', 'sharing', 'growth']) if (typeof state[key] === 'boolean') choices[key] = state[key];
+        if (Number.isFinite(state.compactness) && state.compactness >= 0 && state.compactness <= 0.8 && Math.abs(state.compactness * 20 - Math.round(state.compactness * 20)) < 0.000000001) choices.compactness = Math.round(state.compactness * 20) / 20;
+      }
+      restore(window.openai?.widgetState);
+      window.addEventListener('openai:set_globals', event => {
+        const saved = event.detail?.globals?.widgetState;
+        if (!saved) return;
+        const previous = stateKey();
+        restore(saved);
+        if (previous !== stateKey()) reset();
+      });
+      reducedMotion.addEventListener('change', () => {
+        if (reducedMotion.matches && running) {
+          while (elapsed < duration() - 0.000001) step(Math.min(fixedStep, duration() - elapsed));
+          finish();
+        }
+      });
+      reset();
+      const resizeObserver = new ResizeObserver(() => {
+        const nextWidth = Math.round(root.getBoundingClientRect().width);
+        if (nextWidth === measuredWidth) return;
+        measuredWidth = nextWidth;
+        measure();
+        if (choices.scene === 'overview') {
+          buildOverview();
+          buildGravity();
+        }
+        buildReaction();
+        buildRelativity();
+        draw();
+      });
+      resizeObserver.observe(root);
+    })();
+  </script>
+</div>
