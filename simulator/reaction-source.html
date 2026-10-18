@@ -1,0 +1,434 @@
+<div id="conduct-reaction-preview">
+  <style>
+    #conduct-reaction-preview .conduct-header { padding-right: 96px; margin-bottom: 12px; word-break: keep-all; }
+    #conduct-reaction-preview h3 { margin: 0 0 4px; }
+    #conduct-reaction-preview .conduct-field { margin: 12px 0 8px; }
+    #conduct-reaction-preview .conduct-svg { display: block; width: 100%; color: var(--foreground); overflow: hidden; }
+    #conduct-reaction-preview .conduct-svg text { fill: var(--foreground); font-size: var(--font-size-base); font-weight: 400; }
+    #conduct-reaction-preview .conduct-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 8px; }
+    #conduct-reaction-preview .conduct-swatch { display: inline-block; width: 9px; height: 9px; margin-right: 5px; border-radius: 50%; background: var(--viz-series-1); vertical-align: 0; }
+    #conduct-reaction-preview .conduct-swatch-dust { width: 7px; height: 7px; background: var(--foreground); opacity: 0.5; }
+    #conduct-reaction-preview .conduct-swatch-heavy { width: 11px; height: 11px; opacity: 0.45; }
+    #conduct-reaction-preview .conduct-swatch-given { background: var(--viz-series-2); border-radius: 0; transform: rotate(45deg); width: 7px; height: 7px; }
+    #conduct-reaction-preview .conduct-checks { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; }
+    #conduct-reaction-preview .conduct-ledger { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 16px; margin: 4px 0 8px; }
+    #conduct-reaction-preview .conduct-result { min-height: 1.5em; margin: 8px 0; }
+    #conduct-reaction-preview .conduct-rule { margin-top: 6px; }
+    #conduct-reaction-preview [hidden] { display: none; }
+    @media (max-width: 420px) {
+      #conduct-reaction-preview .conduct-ledger { grid-template-columns: minmax(0, 1fr); }
+    }
+  </style>
+  <div class="conduct-header">
+    <h3>行いと作用反作用</h3>
+    <span class="text-small text-muted">働きかけた分は、同じ大きさで返る</span>
+  </div>
+  <div class="viz-controls">
+    <label class="form-label" for="conduct-target">働きかける相手
+      <select class="form-select" id="conduct-target">
+        <option value="light">軽いものに、何度も</option>
+        <option value="heavy">重いものに、一度</option>
+      </select>
+    </label>
+  </div>
+  <div class="conduct-checks">
+    <label class="form-check"><input class="form-check-input" id="conduct-varied" type="checkbox"><span class="form-check-label">いろいろな向きに働きかける</span></label>
+  </div>
+  <div class="viz-row">
+    <button class="btn btn-primary" id="conduct-run" type="button">動きを見る</button>
+    <span class="text-small text-muted" id="conduct-status" role="status" aria-live="polite">開始前</span>
+  </div>
+  <figure class="conduct-field">
+    <div class="conduct-legend text-small">
+      <span><span class="conduct-swatch" aria-hidden="true"></span>自分（質量60）</span>
+      <span><span class="conduct-swatch conduct-swatch-dust" aria-hidden="true"></span>周りの軽いもの（質量1）</span>
+      <span><span class="conduct-swatch conduct-swatch-heavy" aria-hidden="true"></span>重いもの（質量40）</span>
+      <span>矢印：同じ大きさ・逆向きの力積</span>
+    </div>
+    <svg class="conduct-svg" id="conduct-stage" role="img" aria-labelledby="conduct-title conduct-desc">
+      <title id="conduct-title">働きかけと、同じ大きさで返る反作用</title>
+      <desc id="conduct-desc">自分を表す円が、周りに漂う軽いもの、または重いものに短い力を加えます。力を受けた相手は動き出し、自分は同じ大きさの力を逆向きに受けて動きます。相手に与えた運動量の合計と、自分に返ってきた運動量は、常に大きさが等しく向きが逆です。軽いものに何度も働きかける場合、一回ごとの反作用は小さく、合計は重いものを一度押した場合と同じになります。いろいろな向きに働きかけると、返ってきた分は打ち消し合い、合計の大きさは小さくなります。摩擦や抵抗はなく、自分と相手だけの閉じた系です。下の二本の矢印は、与えた運動量の合計と返ってきた運動量を同じ尺度で示します。</desc>
+      <defs>
+        <marker id="conduct-arrow-given" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="var(--viz-series-2)"></path></marker>
+        <marker id="conduct-arrow-returned" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="var(--viz-series-1)"></path></marker>
+      </defs>
+      <g id="conduct-drawing"></g>
+    </svg>
+    <figcaption class="conduct-rule text-small text-muted">ここで返るのは運動量。良い行いが良い結果を保証する法則ではない</figcaption>
+  </figure>
+  <div class="conduct-ledger text-small tabular-nums">
+    <span><span class="conduct-swatch conduct-swatch-given" aria-hidden="true"></span>与えた運動量（相手の合計） <span id="conduct-given">0</span></span>
+    <span><span class="conduct-swatch" aria-hidden="true"></span>返ってきた運動量（自分） <span id="conduct-returned">0</span></span>
+    <span id="conduct-acts">働きかけ 0回・大きさの和 0</span>
+    <span id="conduct-person">自分の速さ 0.0／秒・最初の位置から 0</span>
+  </div>
+  <p class="conduct-result tabular-nums" id="conduct-result">軽いもの10個に、同じ向きへ小さく働きかける</p>
+  <script>
+    (() => {
+      const root = document.getElementById('conduct-reaction-preview');
+      if (!root) return;
+      const find = id => root.querySelector('#conduct-' + id);
+      const controls = { target: find('target'), varied: find('varied') };
+      const result = find('result');
+      const status = find('status');
+      const runButton = find('run');
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const svgNS = 'http://www.w3.org/2000/svg';
+      const fixedStep = 1 / 120;
+      const planeHeight = 220;
+      const stageHeight = 320;
+      const personMass = 60;
+      const personRadius = 14;
+      const dustMass = 1;
+      const dustRadius = 2.5;
+      // Dust density follows the width, so the nearest target stays within reach at any size.
+      const dustArea = 3000;
+      const minimumDust = 40;
+      const heavyMass = 40;
+      const heavyRadius = 22;
+      const heavyOffset = 72;
+      const pushSpeed = 120;
+      const lightImpulse = dustMass * pushSpeed;
+      const lightActs = 10;
+      const actInterval = 0.6;
+      const heavyImpulse = lightImpulse * lightActs;
+      const heavyActTime = 1.2;
+      const runDuration = 7;
+      const arrowScale = 0.1;
+      const flashDuration = 0.5;
+      // A fixed set of directions, so "varied" runs give the same totals at any width.
+      const variedAngles = [0, 40, 320, 150, 200, 80, 280, 20, 340, 120];
+      let choices = { target: 'light', varied: false };
+      let state = null;
+      let nodes = null;
+      let width = 640;
+      let elapsed = 0;
+      let running = false;
+      let phase = 'ready';
+      let animation = 0;
+      let lastFrame = 0;
+      let pendingStep = 0;
+      let measuredWidth = 0;
+
+      function make(parent, name, attrs = {}) {
+        const node = document.createElementNS(svgNS, name);
+        Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, String(value)));
+        parent.appendChild(node);
+        return node;
+      }
+      function text(parent, value, x, y, anchor = 'middle') {
+        const node = make(parent, 'text', { x, y, 'text-anchor': anchor });
+        node.textContent = value;
+        return node;
+      }
+      function stateKey() { return JSON.stringify(choices); }
+      function persist() {
+        if (typeof window.openai?.setWidgetState !== 'function') return;
+        const names = { light: '軽いものに何度も', heavy: '重いものに一度' };
+        // Inline and exported hosts may return void or a Promise respectively.
+        Promise.resolve(window.openai.setWidgetState({
+          modelContent: { scene: '行いと作用反作用', target: names[choices.target], variedDirections: choices.target === 'light' && choices.varied },
+          privateContent: { ...choices }
+        })).catch(() => {});
+      }
+      function stop() {
+        running = false;
+        cancelAnimationFrame(animation);
+        animation = 0;
+      }
+      function configure() {
+        controls.target.value = choices.target;
+        controls.varied.checked = choices.varied;
+        controls.varied.disabled = choices.target !== 'light';
+      }
+      function schedule() {
+        if (choices.target === 'heavy') return [{ time: heavyActTime, angle: 0, impulse: heavyImpulse, heavy: true, done: false }];
+        return Array.from({ length: lightActs }, (_, k) => ({
+          time: actInterval * (k + 1), angle: choices.varied ? variedAngles[k] * Math.PI / 180 : 0, impulse: lightImpulse, heavy: false, done: false
+        }));
+      }
+      function createState() {
+        let seed = 90211;
+        const random = () => {
+          seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+          return seed / 4294967296;
+        };
+        const person = { x: width / 2, y: planeHeight / 2, vx: 0, vy: 0, startX: width / 2, startY: planeHeight / 2 };
+        const dustCount = Math.max(minimumDust, Math.round(width * planeHeight / dustArea));
+        const dust = Array.from({ length: dustCount }, (_, id) => {
+          let x = 10 + random() * (width - 20);
+          let y = 12 + random() * (planeHeight - 24);
+          // Keep the start area clear so nothing overlaps the body at rest.
+          if (Math.hypot(x - person.x, y - person.y) < 36) {
+            const angle = random() * Math.PI * 2;
+            x = person.x + Math.cos(angle) * 40;
+            y = person.y + Math.sin(angle) * 40;
+          }
+          return { id, x, y, vx: (random() - 0.5) * 8, vy: (random() - 0.5) * 8, radius: dustRadius, pushed: false, gone: false };
+        });
+        const acts = schedule();
+        // One thing within reach per planned push, so each act lands on a nearby target at any width.
+        acts.forEach((act, k) => {
+          if (act.heavy) return;
+          const angle = act.angle + (random() - 0.5) * Math.PI / 5;
+          const distance = 30 + 6 * k;
+          dust.push({ id: dust.length, x: person.x + Math.cos(angle) * distance, y: person.y + Math.sin(angle) * distance, vx: (random() - 0.5) * 8, vy: (random() - 0.5) * 8, radius: dustRadius, pushed: false, gone: false });
+        });
+        const heavy = { x: person.x + heavyOffset, y: person.y, vx: 0, vy: 0, radius: heavyRadius, pushed: false, gone: false };
+        return { person, dust, heavy, acts, actCount: 0, given: { x: 0, y: 0 }, givenMagnitude: 0, flashes: [] };
+      }
+      function build() {
+        const drawing = find('drawing');
+        drawing.replaceChildren();
+        make(drawing, 'line', { x1: 0, x2: width, y1: planeHeight + 8, y2: planeHeight + 8, stroke: 'var(--border)', 'stroke-width': 1 });
+        const startMarker = make(drawing, 'circle', { r: personRadius + 5, fill: 'none', stroke: 'var(--muted-foreground)', 'stroke-width': 1, 'stroke-dasharray': '3 4', 'data-start-marker': 'true' });
+        const startLabel = text(drawing, '最初の位置', 0, 0);
+        const contact = make(drawing, 'g', { 'data-contact-layer': 'true' });
+        const dust = state.dust.map(d => make(drawing, 'circle', { r: dustRadius, fill: 'var(--foreground)', 'fill-opacity': 0.5, 'data-dust': d.id }));
+        const heavy = make(drawing, 'circle', { r: heavyRadius, fill: 'var(--viz-series-1)', 'fill-opacity': 0.35, 'data-body': 'heavy' });
+        const heavyLabel = text(drawing, '重いもの', 0, 0);
+        const person = make(drawing, 'circle', { r: personRadius, fill: 'var(--viz-series-1)', 'fill-opacity': 0.75, 'data-body': 'person' });
+        const personLabel = text(drawing, '自分', 0, 0);
+        const flashes = make(drawing, 'g', { 'data-flash-layer': 'true' });
+        text(drawing, '運動量の合計（矢印は同じ尺度）', 16, planeHeight + 30, 'start').setAttribute('class', 'text-small');
+        const origin = { x: width / 2, y: planeHeight + 72 };
+        make(drawing, 'circle', { cx: origin.x, cy: origin.y, r: 2.5, fill: 'var(--muted-foreground)' });
+        const ledgerGiven = make(drawing, 'line', { x1: origin.x, y1: origin.y, x2: origin.x, y2: origin.y, stroke: 'var(--viz-series-2)', 'stroke-width': 2.5, 'marker-end': 'url(#conduct-arrow-given)', visibility: 'hidden', 'data-ledger': 'given' });
+        const ledgerReturned = make(drawing, 'line', { x1: origin.x, y1: origin.y, x2: origin.x, y2: origin.y, stroke: 'var(--viz-series-1)', 'stroke-width': 2.5, 'marker-end': 'url(#conduct-arrow-returned)', visibility: 'hidden', 'data-ledger': 'returned' });
+        nodes = { drawing, startMarker, startLabel, contact, dust, heavy, heavyLabel, person, personLabel, flashes, origin, ledgerGiven, ledgerReturned };
+      }
+      function measure() {
+        const stage = find('stage');
+        width = Math.max(240, Math.round(stage.getBoundingClientRect().width) || width);
+        stage.setAttribute('viewBox', '0 0 ' + width + ' ' + stageHeight);
+        stage.setAttribute('height', stageHeight);
+      }
+      function reset() {
+        stop();
+        elapsed = 0;
+        pendingStep = 0;
+        phase = 'ready';
+        configure();
+        measure();
+        state = createState();
+        build();
+        draw();
+        runButton.textContent = '動きを見る';
+        status.textContent = '開始前';
+      }
+      function pickDust(angle) {
+        const p = state.person;
+        let best = null;
+        let bestDistance = Infinity;
+        let nearest = null;
+        let nearestDistance = Infinity;
+        for (const d of state.dust) {
+          if (d.pushed || d.gone) continue;
+          const dx = d.x - p.x;
+          const dy = d.y - p.y;
+          const distance = Math.hypot(dx, dy);
+          const offset = Math.abs(Math.atan2(Math.sin(Math.atan2(dy, dx) - angle), Math.cos(Math.atan2(dy, dx) - angle)));
+          if (offset <= Math.PI / 3 && distance < bestDistance) { best = d; bestDistance = distance; }
+          if (distance < nearestDistance) { nearest = d; nearestDistance = distance; }
+        }
+        return best || nearest;
+      }
+      function apply(act) {
+        const s = state;
+        const ux = Math.cos(act.angle);
+        const uy = Math.sin(act.angle);
+        const target = act.heavy ? s.heavy : pickDust(act.angle);
+        if (!target) return;
+        const mass = act.heavy ? heavyMass : dustMass;
+        // The same impulse acts on both bodies in opposite directions, so total momentum stays zero.
+        target.vx += act.impulse / mass * ux;
+        target.vy += act.impulse / mass * uy;
+        target.pushed = true;
+        s.person.vx -= act.impulse / personMass * ux;
+        s.person.vy -= act.impulse / personMass * uy;
+        s.given.x += act.impulse * ux;
+        s.given.y += act.impulse * uy;
+        s.givenMagnitude += act.impulse;
+        s.flashes.push({ time: act.time, target, ux, uy, impulse: act.impulse });
+        s.actCount += 1;
+        act.done = true;
+      }
+      function move(body, dt) {
+        body.x += body.vx * dt;
+        body.y += body.vy * dt;
+        if (body !== state.person && (body.x < -30 || body.x > width + 30 || body.y < -8 || body.y > planeHeight + 8)) body.gone = true;
+      }
+      function step(dt) {
+        for (const act of state.acts) {
+          if (!act.done && elapsed + dt >= act.time - 0.000000001) apply(act);
+        }
+        move(state.person, dt);
+        for (const d of state.dust) if (!d.gone) move(d, dt);
+        if (choices.target === 'heavy' && !state.heavy.gone) move(state.heavy, dt);
+        elapsed += dt;
+      }
+      function arrow(parent, x, y, ux, uy, length, kind) {
+        return make(parent, 'line', {
+          x1: x, y1: y, x2: x + ux * length, y2: y + uy * length,
+          stroke: kind === 'given' ? 'var(--viz-series-2)' : 'var(--viz-series-1)', 'stroke-width': 2, 'marker-end': 'url(#conduct-arrow-' + kind + ')', 'data-force': kind
+        });
+      }
+      function draw() {
+        const s = state;
+        const n = nodes;
+        root.setAttribute('data-phase', phase);
+        root.setAttribute('data-elapsed', elapsed.toFixed(6));
+        n.startMarker.setAttribute('cx', s.person.startX);
+        n.startMarker.setAttribute('cy', s.person.startY);
+        n.startLabel.setAttribute('x', s.person.startX);
+        n.startLabel.setAttribute('y', s.person.startY + personRadius + 24);
+        n.person.setAttribute('cx', s.person.x);
+        n.person.setAttribute('cy', s.person.y);
+        n.personLabel.setAttribute('x', s.person.x);
+        n.personLabel.setAttribute('y', s.person.y - personRadius - 8);
+        s.dust.forEach((d, i) => {
+          const node = n.dust[i];
+          node.setAttribute('visibility', d.gone ? 'hidden' : 'visible');
+          node.setAttribute('cx', d.x);
+          node.setAttribute('cy', d.y);
+          node.setAttribute('fill', d.pushed ? 'var(--viz-series-2)' : 'var(--foreground)');
+          node.setAttribute('fill-opacity', d.pushed ? 0.9 : 0.5);
+          node.setAttribute('data-pushed', d.pushed);
+        });
+        const heavyVisible = choices.target === 'heavy' && !s.heavy.gone;
+        n.heavy.setAttribute('visibility', heavyVisible ? 'visible' : 'hidden');
+        n.heavyLabel.setAttribute('visibility', heavyVisible ? 'visible' : 'hidden');
+        n.heavy.setAttribute('cx', s.heavy.x);
+        n.heavy.setAttribute('cy', s.heavy.y);
+        n.heavyLabel.setAttribute('x', s.heavy.x);
+        n.heavyLabel.setAttribute('y', s.heavy.y - heavyRadius - 8);
+        n.flashes.replaceChildren();
+        n.contact.replaceChildren();
+        for (const f of s.flashes) {
+          if (elapsed - f.time > flashDuration) continue;
+          const length = f.impulse * arrowScale;
+          const targetRadius = f.target.radius;
+          make(n.contact, 'line', { x1: s.person.x, y1: s.person.y, x2: f.target.x, y2: f.target.y, stroke: 'var(--muted-foreground)', 'stroke-opacity': 0.5, 'stroke-width': 1, 'stroke-dasharray': '2 3' });
+          arrow(n.flashes, f.target.x + f.ux * targetRadius, f.target.y + f.uy * targetRadius, f.ux, f.uy, length, 'given');
+          arrow(n.flashes, s.person.x - f.ux * personRadius, s.person.y - f.uy * personRadius, -f.ux, -f.uy, length, 'returned');
+        }
+        const givenMagnitude = Math.hypot(s.given.x, s.given.y);
+        const returnedX = s.person.vx * personMass;
+        const returnedY = s.person.vy * personMass;
+        const returnedMagnitude = Math.hypot(returnedX, returnedY);
+        for (const [node, x, y, magnitude] of [[n.ledgerGiven, s.given.x, s.given.y, givenMagnitude], [n.ledgerReturned, returnedX, returnedY, returnedMagnitude]]) {
+          node.setAttribute('visibility', magnitude > 0 ? 'visible' : 'hidden');
+          node.setAttribute('x2', n.origin.x + x * arrowScale);
+          node.setAttribute('y2', n.origin.y + y * arrowScale);
+        }
+        const speed = Math.hypot(s.person.vx, s.person.vy);
+        const shift = Math.hypot(s.person.x - s.person.startX, s.person.y - s.person.startY);
+        find('given').textContent = givenMagnitude.toFixed(0);
+        find('returned').textContent = returnedMagnitude.toFixed(0);
+        find('acts').textContent = '働きかけ ' + s.actCount + '回・大きさの和 ' + s.givenMagnitude.toFixed(0);
+        find('person').textContent = '自分の速さ ' + speed.toFixed(1) + '／秒・最初の位置から ' + shift.toFixed(0);
+        const stage = find('stage');
+        const metrics = { target: choices.target, varied: choices.target === 'light' && choices.varied, acts: s.actCount, 'given-magnitude': givenMagnitude.toFixed(6), 'returned-magnitude': returnedMagnitude.toFixed(6), 'impulse-sum': s.givenMagnitude.toFixed(6), 'person-speed': speed.toFixed(6), 'person-shift': shift.toFixed(6), 'given-x': s.given.x.toFixed(6), 'given-y': s.given.y.toFixed(6), 'returned-x': returnedX.toFixed(6), 'returned-y': returnedY.toFixed(6) };
+        Object.entries(metrics).forEach(([key, value]) => stage.setAttribute('data-' + key, value));
+        result.textContent = describe(givenMagnitude, speed);
+      }
+      function describe(givenMagnitude, speed) {
+        const total = heavyImpulse.toFixed(0);
+        if (phase === 'ready') {
+          if (choices.target === 'heavy') return '重いもの一つに、一度だけ働きかける';
+          return choices.varied ? '軽いもの' + lightActs + '個に、いろいろな向きへ小さく働きかける' : '軽いもの' + lightActs + '個に、同じ向きへ小さく働きかける';
+        }
+        if (phase !== 'complete') return '与えた ' + givenMagnitude.toFixed(0) + ' ＝ 返ってきた ' + givenMagnitude.toFixed(0);
+        if (choices.target === 'heavy') return '1回で合計' + total + '。すぐに押し返され、自分も ' + speed.toFixed(1) + '／秒で動く';
+        if (choices.varied) return '向きがばらばらだと返りは打ち消し合い、合計は ' + givenMagnitude.toFixed(0) + ' にとどまる。それでも一つ一つは同じ大きさで返っている';
+        return lightActs + '回の合計' + total + 'は、重いものを1回押したときと同じ。1回ずつは小さくても、返った分はすべて自分の速さ ' + speed.toFixed(1) + '／秒に残る';
+      }
+      function finish() {
+        stop();
+        phase = 'complete';
+        draw();
+        runButton.textContent = 'もう一度見る';
+        status.textContent = '終了';
+        persist();
+      }
+      function tick(now) {
+        if (!running) return;
+        pendingStep += Math.min(0.1, (now - lastFrame) / 1000);
+        lastFrame = now;
+        while (pendingStep >= fixedStep && elapsed < runDuration) {
+          step(Math.min(fixedStep, runDuration - elapsed));
+          pendingStep -= fixedStep;
+        }
+        draw();
+        if (elapsed >= runDuration - 0.000001) finish();
+        else animation = requestAnimationFrame(tick);
+      }
+      function runToEnd() {
+        while (elapsed < runDuration - 0.000001) step(Math.min(fixedStep, runDuration - elapsed));
+        finish();
+      }
+      runButton.addEventListener('click', () => {
+        if (running) {
+          stop();
+          phase = 'paused';
+          draw();
+          runButton.textContent = '続きを見る';
+          status.textContent = '一時停止';
+          return;
+        }
+        if (phase === 'complete') reset();
+        if (reducedMotion.matches) {
+          runToEnd();
+          return;
+        }
+        running = true;
+        phase = 'running';
+        runButton.textContent = '一時停止';
+        status.textContent = '動作中';
+        lastFrame = performance.now();
+        animation = requestAnimationFrame(tick);
+      });
+      controls.target.addEventListener('change', () => {
+        choices.target = controls.target.value === 'heavy' ? 'heavy' : 'light';
+        reset();
+        persist();
+      });
+      controls.varied.addEventListener('change', () => {
+        choices.varied = controls.varied.checked;
+        reset();
+        persist();
+      });
+      function restore(saved) {
+        const saved_ = saved?.privateContent || saved;
+        if (!saved_ || typeof saved_ !== 'object' || Array.isArray(saved_)) return;
+        if (saved_.target === 'light' || saved_.target === 'heavy') choices.target = saved_.target;
+        if (typeof saved_.varied === 'boolean') choices.varied = saved_.varied;
+      }
+      restore(window.openai?.widgetState);
+      window.addEventListener('openai:set_globals', event => {
+        const saved = event.detail?.globals?.widgetState;
+        if (!saved) return;
+        const previous = stateKey();
+        restore(saved);
+        if (previous !== stateKey()) reset();
+      });
+      reducedMotion.addEventListener('change', () => {
+        if (reducedMotion.matches && running) runToEnd();
+      });
+      reset();
+      const resizeObserver = new ResizeObserver(() => {
+        const nextWidth = Math.round(root.getBoundingClientRect().width);
+        if (nextWidth === measuredWidth) return;
+        measuredWidth = nextWidth;
+        if (phase === 'ready') {
+          reset();
+          return;
+        }
+        measure();
+        build();
+        draw();
+      });
+      resizeObserver.observe(root);
+    })();
+  </script>
+</div>

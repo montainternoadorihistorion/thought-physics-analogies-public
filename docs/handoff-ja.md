@@ -73,6 +73,8 @@ gh api repos/montainternoadorihistorion/thought-physics-analogies/pulls/1 --jq '
 | [README.md](../README.md) | 概要と開き方 |
 | [simulator/source.html](../simulator/source.html) | **編集元**。会話内表示用のHTML fragment |
 | [simulator/index.html](../simulator/index.html) | **ブラウザーで開くファイル**。表示用の枠組みに編集元を埋め込んだ単独HTML |
+| [simulator/reaction-source.html](../simulator/reaction-source.html) | **編集元**。別ページ「行いと作用反作用」の HTML fragment |
+| [simulator/reaction.html](../simulator/reaction.html) | **ブラウザーで開くファイル**。上の編集元を同じ枠組みに埋め込んだ単独HTML |
 | [docs/model-notes-ja.md](model-notes-ja.md) | 数式、追加した仮定、限界、再現用定数と検証結果 |
 | [docs/research-draft-ja.md](research-draft-ja.md) | ユーザーから提供された日本語初稿 |
 
@@ -85,6 +87,8 @@ gh api repos/montainternoadorihistorion/thought-physics-analogies/pulls/1 --jq '
 
 既定画面は固定条件です。詳細画面で保持している設定を混ぜません。自動再生や無限ループはなく、ボタンで開始・一時停止・再開・繰り返しを操作します。動きを減らす設定では終了状態を表示します。
 
+別ページ `simulator/reaction.html`（行いと作用反作用）は、同じ枠組みで作った独立した試作です。自分（質量60）が周りの軽いもの（質量1）に10回、または重いもの（質量40）に一度働きかけ、与えた運動量の合計と自分に返ってきた運動量が常に等しいことを示します。「いろいろな向きに働きかける」で、返りが打ち消し合う様子も見られます。既存の「作用反作用」場面はそのまま残しています。操作の約束（開始・一時停止・再開・繰り返し、動きを減らす設定、保存）は本体と同じです。
+
 ## 起動と編集
 
 リポジトリ内の `simulator/index.html` をブラウザーで開けば動きます。HTTP経由で確認する場合は、チェックアウトのルートで次を実行できます。
@@ -93,13 +97,13 @@ gh api repos/montainternoadorihistorion/thought-physics-analogies/pulls/1 --jq '
 python3 -m http.server 8000 --bind 127.0.0.1 --directory simulator
 ```
 
-ブラウザーで `http://127.0.0.1:8000/` を開きます。ポートが使用中なら番号を変えてください。配信を終えるときは `Ctrl+C` で停止します。
+ブラウザーで `http://127.0.0.1:8000/` を開きます。別ページは `http://127.0.0.1:8000/reaction.html` です。ポートが使用中なら番号を変えてください。配信を終えるときは `Ctrl+C` で停止します。
 
 以前案内した `http://127.0.0.1:36989/?view=receiver-time` は一時プレビュー用です。確認時点ではサーバーが停止しており、恒久的な参照先には使えません。開いているタブには古い画面が残ることがあるため、ファイル更新後は再読み込みしてください。ブラウザーや実行環境が `file:` URLを扱えない場合は、HTTPで確認してください。
 
 編集するときは `source.html` を修正し、**`index.html` とインライン表示用コピーにも反映**してください。`source.html` を単純に `index.html` へコピーすると、表示用のスタイルや保存機能の枠組みが失われます。
 
-元の開発環境では、Git管理外の `work/export_simulator.py` が表示ホストのrendererを使って書き出し、不要な外部スクリプト読み込みを除去しています。この書き出しツールはcloneだけでは揃いません。別のAIがこのツールを使えない場合は、`source.html` の修正ファイルまたは差分を返し、元の開発環境で単独HTMLと会話内表示を同期できます。単独HTMLの生成を検証していない場合は、その旨を明記してください。
+元の開発環境では、Git管理外の `work/export_simulator.py` が表示ホストのrendererを使って書き出し、不要な外部スクリプト読み込みを除去しています。別ページは同じツールに `--title 行いと作用反作用` を付けて、`reaction-source.html` から `reaction.html` を書き出します。この書き出しツールはcloneだけでは揃いません。別のAIがこのツールを使えない場合は、`source.html` の修正ファイルまたは差分を返し、元の開発環境で単独HTMLと会話内表示を同期できます。単独HTMLの生成を検証していない場合は、その旨を明記してください。
 
 ## 数値モデルと確認結果
 
@@ -118,6 +122,7 @@ python3 -m http.server 8000 --bind 127.0.0.1 --directory simulator
 | 既定画面の手元の時計 | `u = 0.6`、外10秒に対し約6.324555320秒 |
 | 時計の詳細画面 | `u = 0 / 0.6 / 0.8` で、局所経過時間は `10 / 約6.324555 / 約4.472136秒` |
 | 作用反作用 | 質量が2倍の物体の変位は、同じ条件の質量1の物体の半分 |
+| 別ページ：軽いもの10回／重いもの1回 | 与えた運動量の合計1200＝返ってきた1200、終わりの自分の速さ20／秒。いろいろな向きでは合計約319、速さ約5.3／秒 |
 
 時計は、球対称・非回転・無電荷の重力源の外で静止した時計と無限遠を比較するモデルです。進行比は `√(1 − u)`、`u = 2GM / (rc²)` です。粒子の引き寄せ・捕捉・共有と時計は独立した計算で、成長する引力と時空の連成計算ではありません。情報のコピーは理解・学習の成立を保証しません。
 
@@ -134,6 +139,7 @@ python3 -m http.server 8000 --bind 127.0.0.1 --directory simulator
 このPCのタスク作業領域に、次の記録があります。いずれもGit管理外です。
 
 - `work/stream-qa/report.json`：情報の流れ導入後（2026年10月18日）の終了値8通り、初期引力0.5と3、開始・一時停止・再開、再読み込み後の復元、320・736・1024pxの表示、時計と作用反作用の起動確認。同じディレクトリに検証スクリプトとスクリーンショット。
+- `work/conduct-qa/report.json`：別ページ「行いと作用反作用」の三条件の合計と速さ、対になる矢印、一時停止、再読み込み後の復元、320・736・1024pxの表示。同じディレクトリに検証スクリプトとスクリーンショット。
 - `work/no-road-qa/report.json`：流れ導入前の版での、四つの画面、320・736・1024pxと明暗テーマの24通り、時計の条件、保存状態、表示上の確認。
 - `work/inline-runtime-qa/report.json`：上記の保存API互換性、実際の再生終了、場面変更、状態通知の確認。
 - 各ディレクトリの検証スクリプトや画像：再現用の資材。Node・Playwright・Chromium等の絶対パスを含み、そのまま別環境へ移して実行する想定にはなっていません。

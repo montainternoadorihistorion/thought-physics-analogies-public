@@ -19,6 +19,7 @@
 2. `docs/model-notes-ja.md`
 3. `simulator/source.html`（編集元）
 4. `simulator/index.html`（単独で開ける完成版）
+5. `simulator/reaction-source.html` と `simulator/reaction.html`（別ページ「行いと作用反作用」。担当する変更に関係する場合）
 
 研究本文を検討する場合は `docs/research-draft-ja.md` も渡してください。添付の数や形式に制限があれば、担当する変更に必要なファイルから渡します。
 
@@ -30,4 +31,4 @@ GitHubへのpushやPR更新を担当させる必要はありません。修正�
 
 ## そのまま渡せる依頼文
 
-> このプロジェクトの公開ソースは https://github.com/montainternoadorihistorion/thought-physics-analogies-public の `feat/research-prototype` ブランチにあります。URLまたは添付ファイルから `docs/handoff-ja.md` と `docs/model-notes-ja.md` を読んでください。担当してほしい変更は、続けて私が指定します。既存の四つの場面とユーザーの方針を守り、研究初稿の本文は変更しないでください。取得・実行・GitHubへの書き込みができない場合でも、提供したソースをもとに検討し、修正ファイルまたはunified diffを返してください。実際に確認できたことと、環境上できなかった確認を区別して報告してください。
+> このプロジェクトの公開ソースは https://github.com/montainternoadorihistorion/thought-physics-analogies-public の `feat/research-prototype` ブランチにあります。URLまたは添付ファイルから `docs/handoff-ja.md` と `docs/model-notes-ja.md` を読んでください。担当してほしい変更は、続けて私が指定します。既存の四つの場面と別ページ（行いと作用反作用）、ユーザーの方針を守り、研究初稿の本文は変更しないでください。取得・実行・GitHubへの書き込みができない場合でも、提供したソースをもとに検討し、修正ファイルまたはunified diffを返してください。実際に確認できたことと、環境上できなかった確認を区別して報告してください。
