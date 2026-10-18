@@ -12,6 +12,7 @@
     #thought-physics-preview .thought-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 8px; }
     #thought-physics-preview .thought-swatch { display: inline-block; width: 8px; height: 8px; margin-right: 5px; background: var(--viz-series-1); border-radius: 50%; }
     #thought-physics-preview .thought-swatch-copy { background: var(--viz-series-2); border-radius: 0; transform: rotate(45deg); }
+    #thought-physics-preview .thought-swatch-ghost { box-sizing: border-box; background: none; border: 1px solid var(--foreground); opacity: 0.6; }
     #thought-physics-preview .thought-checks { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 8px; }
     #thought-physics-preview .thought-result { min-height: 1.5em; margin: 8px 0; }
     #thought-physics-preview .thought-rule { margin-top: 6px; }
@@ -64,9 +65,14 @@
       <span class="thought-story-phase" data-story-phase-label="share">分ける</span><span aria-hidden="true">→</span>
       <span class="thought-story-phase" data-story-phase-label="grow">育つ</span>
     </div>
+    <div class="thought-legend text-small">
+      <span><span class="thought-swatch" aria-hidden="true"></span>丸い点：情報粒子</span>
+      <span><span class="thought-swatch thought-swatch-copy" aria-hidden="true"></span>菱形：共有されたコピー</span>
+      <span><span class="thought-swatch thought-swatch-ghost" aria-hidden="true"></span>輪：思考がなければ通った位置</span>
+    </div>
     <svg class="thought-svg" id="thought-overview-stage" role="img" aria-labelledby="thought-overview-title thought-overview-desc">
       <title id="thought-overview-title">思考を重力に見立てた情報収集と、同じ受信区間を測る二つの時計</title>
-      <desc id="thought-overview-desc">丸い情報粒子が思考の中心に引き寄せられ、隣の強い思考から菱形のコピーが共有されます。異なる情報の蓄積に応じて引力が上限まで増します。二つの時計は、同じ情報を受け取る同じ区間を測ります。この例では外の時計で10秒、手元の時計で約6.32秒です。短いのは手元の経過時間で、外から見た情報収集の完了が時計の遅れによって早まる計算ではありません。手元でも自分の時計は通常どおり進みます。時計は球対称・非回転・無電荷の重力源の外側に静止させた時計と、無限遠の基準時計の独立した比較です。静的な質量条件uは0.6で固定し、時計の進みの比率は1からuを引いた値の平方根です。情報粒子の経路とコピーは従来の比喩モデルのままで、相対論の粒子や光の軌道を計算していません。比喩モデルの受信区間を外の時計の10秒へ例示的に換算しています。共有と蓄積による成長は追加の仮定です。針は一周10秒です。</desc>
+      <desc id="thought-overview-desc">丸い情報粒子は左から右へ一定の速さで流れ、思考の引力で曲がり、近くを通るものが捕捉されます。薄い輪は、思考がなければ通っていた位置です。隣の強い思考から菱形のコピーが共有されます。異なる情報の蓄積に応じて引力が上限まで増し、引き込める幅が広がります。二つの時計は、同じ情報を受け取る同じ区間を測ります。この例では外の時計で10秒、手元の時計で約6.32秒です。短いのは手元の経過時間で、外から見た情報収集の完了が時計の遅れによって早まる計算ではありません。手元でも自分の時計は通常どおり進みます。時計は球対称・非回転・無電荷の重力源の外側に静止させた時計と、無限遠の基準時計の独立した比較です。静的な質量条件uは0.6で固定し、時計の進みの比率は1からuを引いた値の平方根です。情報粒子の経路とコピーは従来の比喩モデルのままで、相対論の粒子や光の軌道を計算していません。比喩モデルの受信区間を外の時計の10秒へ例示的に換算しています。共有と蓄積による成長は追加の仮定です。針は一周10秒です。</desc>
       <g id="thought-overview-drawing"></g>
     </svg>
     <figcaption class="thought-rule text-small text-muted">短いのは手元の経過時間</figcaption>
@@ -75,13 +81,14 @@
     <div class="thought-legend text-small">
       <span><span class="thought-swatch" aria-hidden="true"></span>丸い点：情報粒子</span>
       <span><span class="thought-swatch thought-swatch-copy" aria-hidden="true"></span>菱形：共有されたコピー</span>
+      <span><span class="thought-swatch thought-swatch-ghost" aria-hidden="true"></span>輪：思考がなければ通った位置</span>
     </div>
     <div class="thought-worlds">
       <section class="thought-world" aria-labelledby="thought-alone-heading">
         <div class="thought-world-heading"><span id="thought-alone-heading">学ぶ人が単独で集める</span><span class="tabular-nums" id="thought-alone-total">情報 0点</span></div>
         <svg class="thought-svg" id="thought-alone-stage" role="img" aria-labelledby="thought-alone-title thought-alone-desc">
           <title id="thought-alone-title">単独で情報を集める比喩モデル</title>
-          <desc id="thought-alone-desc">固定された中心に情報粒子が引き寄せられます。蓄積による成長を有効にすると、得た情報に応じて引力が上限まで増します。</desc>
+          <desc id="thought-alone-desc">左から右へ流れる情報粒子が、固定された中心の引力で曲がり、近くを通るものは捕捉されます。薄い輪は、思考がなければ通っていた位置です。蓄積による成長を有効にすると、得た情報に応じて引力が上限まで増し、引き込める幅が広がります。</desc>
           <g id="thought-alone-drawing"></g>
         </svg>
         <div class="thought-counts text-small tabular-nums"><span id="thought-alone-own">自分で 0</span><span id="thought-alone-growth">引力 1.0×</span></div>
@@ -90,13 +97,13 @@
         <div class="thought-world-heading"><span id="thought-near-heading">強い収集者のそばで集める</span><span class="tabular-nums" id="thought-near-total">情報 0点</span></div>
         <svg class="thought-svg" id="thought-near-stage" role="img" aria-labelledby="thought-near-title thought-near-desc">
           <title id="thought-near-title">隣の収集者と情報共有を比較する比喩モデル</title>
-          <desc id="thought-near-desc">左と同じ初期粒子です。隣の強い中心も粒子を集めます。共有を有効にすると、その情報のコピーが点線を通って学ぶ人に届きます。共有は引力とは別の追加ルールです。</desc>
+          <desc id="thought-near-desc">左と同じ情報の流れです。隣の強い中心も粒子を曲げて集めます。共有を有効にすると、その情報のコピーが点線を通って学ぶ人に届きます。共有は引力とは別の追加ルールです。</desc>
           <g id="thought-near-drawing"></g>
         </svg>
         <div class="thought-counts text-small tabular-nums"><span id="thought-near-own">自分で 0</span><span id="thought-near-received">共有 0</span><span id="thought-near-growth">引力 1.0×</span></div>
       </section>
     </div>
-    <figcaption class="thought-rule text-small text-muted" id="thought-information-rule">同じ初期粒子で比較・共有と蓄積による成長は追加ルール</figcaption>
+    <figcaption class="thought-rule text-small text-muted" id="thought-information-rule">同じ情報の流れで比較・共有と蓄積による成長は追加ルール</figcaption>
   </figure>
   <figure class="thought-field" id="thought-relativity-field" hidden>
     <div class="thought-world-heading"><span id="thought-relativity-heading">物理の時計</span><span class="tabular-nums" id="thought-relativity-rate">近く 63.2%</span></div>
@@ -117,7 +124,7 @@
       <g id="thought-drawing"></g>
     </svg>
   </figure>
-  <p class="thought-result tabular-nums" id="thought-result">同じ情報粒子から、単独と隣に収集者がいる場合を比べる</p>
+  <p class="thought-result tabular-nums" id="thought-result">同じ情報の流れで、単独と隣に収集者がいる場合を比べる</p>
   <script>
     (() => {
       const root = document.getElementById('thought-physics-preview');
@@ -146,6 +153,15 @@
       const growthLimit = 2.8;
       const growthInformationScale = 48;
       const referenceInterval = 10;
+      // Information drifts left to right; thought bends the stream and captures what passes close enough.
+      const streamSpeed = 60;
+      const streamSpeedJitter = 0.1;
+      const streamSideSpeed = 5;
+      const upstreamSpan = streamSpeed * collectionDuration;
+      const upstreamCount = Math.round(particleCount * upstreamSpan / worldWidth);
+      const ghostVisibleShift = 4;
+      const ghostFadeShift = 60;
+      const ghostHiddenShift = 120;
       const overviewPreset = Object.freeze({ strength: 1, nearby: true, sharing: true, growth: true, compactness: 0.6 });
       const validScenes = ['overview', 'gravity', 'relativity', 'reaction'];
       const initialScene = normalizeScene(root.dataset.startScene) || 'gravity';
@@ -162,6 +178,9 @@
       let pendingStep = 0;
       let measuredWidth = 0;
       const dimensions = { alone: 320, near: 320, reaction: 640, relativity: 640, overview: 640 };
+      // Wide layouts stretch the field sideways; cap it so bent paths keep a recognisable shape.
+      const maxStretch = 1.5;
+      const offsets = { alone: 0, near: 0 };
 
       function make(parent, name, attrs = {}) {
         const node = document.createElementNS(svgNS, name);
@@ -214,7 +233,7 @@
         find('near-heading').textContent = choices.nearby ? '強い収集者のそばで集める' : '隣の収集者なし';
         find('information-rule').textContent = choices.nearby && !choices.sharing
           ? '共有なし：隣の引力は、同じ粒子を奪い合う場合もある'
-          : '同じ初期粒子で比較・共有と蓄積による成長は追加ルール';
+          : '同じ情報の流れで比較・共有と蓄積による成長は追加ルール';
       }
       function growthMultiplier(known) {
         return informationSettings().growth ? 1 + (growthLimit - 1) * Math.min(known.size / growthInformationScale, 1) : 1;
@@ -241,8 +260,15 @@
               y = center.y + Math.sin(angle) * 38;
             }
           }
-          return { id, x, y, vx: 0, vy: 0, owner: null, trail: [[x, y]] };
+          return { id, x, y };
         });
+        // The stream continues upstream at the same density, so information keeps arriving for the whole run.
+        for (let i = 0; i < upstreamCount; i++) particles.push({ id: particleCount + i, x: -random() * upstreamSpan, y: 16 + random() * (worldHeight - 32) });
+        for (const p of particles) {
+          const vx = streamSpeed * (1 - streamSpeedJitter + 2 * streamSpeedJitter * random());
+          const vy = (random() - 0.5) * 2 * streamSideSpeed;
+          Object.assign(p, { vx, vy, origin: { x: p.x, y: p.y, vx, vy }, owner: null, gone: false, trail: [[p.x, p.y]] });
+        }
         return { neighbor, particles, own: new Set(), received: new Set(), known: new Set(), collector: new Set(), copies: [], nodes: null };
       }
       function fieldNodes(parent, owner) {
@@ -258,15 +284,21 @@
           const name = index === 0 ? 'alone' : 'near';
           const drawing = choices.scene === 'overview' && index === 1 ? overviewNodes.information : find(name + '-drawing');
           drawing.replaceChildren();
+          drawing.setAttribute('transform', 'translate(' + offsets[name] + ' 0)');
           const connector = make(drawing, 'line', { stroke: 'var(--viz-series-2)', 'stroke-opacity': 0.6, 'stroke-width': 1.5, 'stroke-dasharray': '4 5', 'data-sharing-path': name });
           const trails = world.particles.map(p => make(drawing, 'polyline', { fill: 'none', stroke: 'var(--foreground)', 'stroke-opacity': 0.16, 'stroke-width': 1, 'data-trail': p.id }));
+          // Ghosts mark where each particle would be without any thought pulling on it.
+          const pulls = world.particles.map(p => make(drawing, 'line', { stroke: 'var(--foreground)', 'stroke-width': 1, visibility: 'hidden', 'data-pull': p.id }));
+          const ghosts = world.particles.map(p => make(drawing, 'circle', { r: 2.5, fill: 'none', stroke: 'var(--foreground)', 'stroke-width': 1, visibility: 'hidden', 'data-ghost': p.id }));
           const learner = fieldNodes(drawing, 'learner');
           const collector = world.neighbor ? fieldNodes(drawing, 'collector') : null;
           const particles = world.particles.map(p => make(drawing, 'circle', { r: 2.5, fill: 'var(--foreground)', 'fill-opacity': 0.55, 'data-particle': p.id }));
           const copies = make(drawing, 'g', { fill: 'var(--viz-series-2)', 'data-copy-layer': name });
           const learnerLabel = text(drawing, '学ぶ人', 0, 0);
           const collectorLabel = world.neighbor ? text(drawing, '収集者', 0, 0) : null;
-          world.nodes = { drawing, connector, learner, collector, trails, particles, copies, learnerLabel, collectorLabel };
+          const flowLabel = text(drawing, '情報の流れ →', 12, 18, 'start');
+          Object.entries({ stroke: 'var(--background)', 'stroke-width': 3, 'stroke-linejoin': 'round', 'paint-order': 'stroke' }).forEach(([key, value]) => flowLabel.setAttribute(key, String(value)));
+          world.nodes ={ drawing, connector, learner, collector, trails, pulls, ghosts, particles, copies, learnerLabel, collectorLabel };
         });
       }
       function setView(name, svg, height) {
@@ -326,14 +358,16 @@
         const drawing = find('overview-drawing');
         drawing.replaceChildren();
         const width = dimensions.overview;
+        const left = offsets.near;
         const information = make(drawing, 'g', { 'data-story-information': 'true' });
-        const informationLabel = text(drawing, '自分で0 ＋ 共有0', 16, 50, 'start');
-        text(drawing, '共有', (learnerCenter.x + collectorCenter.x) / (2 * worldWidth) * width, 103);
+        const informationLabel = text(drawing, '自分で0 ＋ 共有0', left + 16, 50, 'start');
+        Object.entries({ stroke: 'var(--background)', 'stroke-width': 3, 'stroke-linejoin': 'round', 'paint-order': 'stroke' }).forEach(([key, value]) => informationLabel.setAttribute(key, String(value)));
+        text(drawing, '共有', left + (learnerCenter.x + collectorCenter.x) / (2 * worldWidth) * dimensions.near, 103);
         const clocks = {};
         const clockY = 332;
-        const clockLeft = width < 500 ? width * 0.28 : 62;
-        const clockRight = width < 500 ? width * 0.72 : 174;
-        text(drawing, '同じ受信区間・1周10秒', 16, clockY - 54, 'start');
+        const clockLeft = width < 500 ? width * 0.28 : left + 62;
+        const clockRight = width < 500 ? width * 0.72 : left + 174;
+        text(drawing, '同じ受信区間・1周10秒', left + 16, clockY - 54, 'start');
         for (const [name, cx, caption] of [['reference', clockLeft, '外の時計'], ['local', clockRight, '手元の時計']]) {
           text(drawing, caption, cx, clockY - 28);
           make(drawing, 'circle', { cx, cy: clockY, r: 20, fill: 'none', stroke: 'var(--border)', 'stroke-width': 1 });
@@ -369,9 +403,16 @@
         find('overview-stage').setAttribute('viewBox', '0 0 ' + fullWidth + ' 400');
         find('overview-stage').setAttribute('height', 400);
         if (choices.scene === 'overview') dimensions.near = fullWidth;
+        fitWorld('alone');
+        fitWorld('near');
         dimensions.reaction = fullWidth;
         find('stage').setAttribute('viewBox', '0 0 ' + fullWidth + ' ' + (fullWidth < 420 ? 250 : 272));
         find('stage').setAttribute('height', fullWidth < 420 ? 250 : 272);
+      }
+      function fitWorld(name) {
+        const available = dimensions[name];
+        dimensions[name] = Math.min(available, maxStretch * worldWidth);
+        offsets[name] = (available - dimensions[name]) / 2;
       }
       function acceleration(world, x, y) {
         let ax = 0;
@@ -406,7 +447,7 @@
         // All particles in a step see the same mass snapshot; captures update it for the next step.
         const captures = [];
         for (const p of world.particles) {
-          if (p.owner || elapsed >= collectionDuration - 0.000001) continue;
+          if (p.owner || p.gone || elapsed >= collectionDuration - 0.000001) continue;
           const a = acceleration(world, p.x, p.y);
           const x = p.x + p.vx * dt + a.x * dt * dt / 2;
           const y = p.y + p.vy * dt + a.y * dt * dt / 2;
@@ -421,6 +462,7 @@
             p.y = y;
             p.vx += (a.x + next.x) * dt / 2;
             p.vy += (a.y + next.y) * dt / 2;
+            if (p.x > worldWidth + 30 || p.y < -60 || p.y > worldHeight + 60) p.gone = true;
             if (Math.floor((elapsed + dt) / 0.08) !== Math.floor(elapsed / 0.08)) {
               p.trail.push([x, y]);
               if (p.trail.length > 9) p.trail.shift();
@@ -486,11 +528,24 @@
           }
           let ownIndex = 0;
           let collectorIndex = 0;
+          let gone = 0;
+          const ghostTime = Math.min(elapsed, collectionDuration);
           world.particles.forEach((p, i) => {
             const node = nodes.particles[i];
             const trail = nodes.trails[i];
+            const ghost = nodes.ghosts[i];
+            const pull = nodes.pulls[i];
+            const offscreen = p.gone || (!p.owner && p.x < -4);
+            if (p.gone) gone++;
+            node.setAttribute('visibility', offscreen ? 'hidden' : 'visible');
+            trail.setAttribute('visibility', p.owner || offscreen ? 'hidden' : 'visible');
+            if (offscreen) {
+              ghost.setAttribute('visibility', 'hidden');
+              pull.setAttribute('visibility', 'hidden');
+              node.setAttribute('data-owner', p.gone ? 'gone' : 'upstream');
+              return;
+            }
             trail.setAttribute('points', p.trail.map(point => (point[0] * scaleX) + ',' + point[1]).join(' '));
-            trail.setAttribute('visibility', p.owner ? 'hidden' : 'visible');
             const center = p.owner === 'learner' ? learnerCenter : collectorCenter;
             const pos = p.owner ? packedPosition(p.owner === 'learner' ? ownIndex++ : collectorIndex++, p.owner === 'learner' ? world.own.size : world.collector.size, center, 14 + 4 * Math.sqrt(p.owner === 'learner' ? learnerGrowth : growthMultiplier(world.collector))) : p;
             node.setAttribute('cx', pos.x * scaleX);
@@ -499,6 +554,27 @@
             node.setAttribute('fill', p.owner ? 'var(--viz-series-1)' : 'var(--foreground)');
             node.setAttribute('fill-opacity', p.owner ? 0.95 : 0.55);
             node.setAttribute('data-owner', p.owner || 'free');
+            let shown = false;
+            if (!p.owner) {
+              const ghostX = p.origin.x + p.origin.vx * ghostTime;
+              const ghostY = p.origin.y + p.origin.vy * ghostTime;
+              const shift = Math.hypot(p.x - ghostX, p.y - ghostY);
+              if (shift >= ghostVisibleShift && shift < ghostHiddenShift && ghostX <= worldWidth + 4) {
+                const strength = shift <= ghostFadeShift ? 1 : 1 - (shift - ghostFadeShift) / (ghostHiddenShift - ghostFadeShift);
+                ghost.setAttribute('cx', ghostX * scaleX);
+                ghost.setAttribute('cy', ghostY);
+                ghost.setAttribute('stroke-opacity', (0.45 * strength).toFixed(3));
+                pull.setAttribute('x1', ghostX * scaleX);
+                pull.setAttribute('y1', ghostY);
+                pull.setAttribute('x2', p.x * scaleX);
+                pull.setAttribute('y2', p.y);
+                pull.setAttribute('stroke-opacity', (0.3 * strength).toFixed(3));
+                pull.setAttribute('data-shift', shift.toFixed(3));
+                shown = true;
+              }
+            }
+            ghost.setAttribute('visibility', shown ? 'visible' : 'hidden');
+            pull.setAttribute('visibility', shown ? 'visible' : 'hidden');
           });
           nodes.connector.setAttribute('x1', collectorCenter.x * scaleX);
           nodes.connector.setAttribute('y1', collectorCenter.y);
@@ -523,13 +599,14 @@
           stage.setAttribute('data-received', world.received.size);
           stage.setAttribute('data-known', world.known.size);
           stage.setAttribute('data-collector', world.collector.size);
+          stage.setAttribute('data-gone', gone);
           stage.setAttribute('data-growth', learnerGrowth.toFixed(6));
           find(name + '-total').textContent = '情報 ' + world.known.size + '点';
           find(name + '-own').textContent = '自分で ' + world.own.size;
           if (index === 1) find('near-received').textContent = '共有 ' + world.received.size;
           find(name + '-growth').textContent = '引力 ' + (informationSettings().strength * learnerGrowth).toFixed(1) + '×';
         });
-        result.textContent = elapsed === 0 ? '同じ情報粒子から、単独と隣に収集者がいる場合を比べる' : '学ぶ人が持つ情報：単独 ' + worlds[0].known.size + '点 ／ 比較側 ' + worlds[1].known.size + '点';
+        result.textContent = elapsed === 0 ? '同じ情報の流れで、単独と隣に収集者がいる場合を比べる' : '学ぶ人が持つ情報：単独 ' + worlds[0].known.size + '点 ／ 比較側 ' + worlds[1].known.size + '点';
       }
       function drawReaction() {
         const width = dimensions.reaction;
@@ -589,8 +666,8 @@
           if (selected) node.setAttribute('aria-current', 'step');
           else node.removeAttribute('aria-current');
         });
-        const maximumCopyRadius = (29 + 4 * Math.sqrt(growthLimit)) * dimensions.overview / worldWidth;
-        world.nodes.learnerLabel.setAttribute('x', learnerCenter.x / worldWidth * dimensions.overview - maximumCopyRadius - 8);
+        const maximumCopyRadius = (29 + 4 * Math.sqrt(growthLimit)) * dimensions.near / worldWidth;
+        world.nodes.learnerLabel.setAttribute('x', learnerCenter.x / worldWidth * dimensions.near - maximumCopyRadius - 8);
         world.nodes.learnerLabel.setAttribute('y', learnerCenter.y + 4);
         world.nodes.learnerLabel.setAttribute('text-anchor', 'end');
         world.nodes.learnerLabel.textContent = '思考';
